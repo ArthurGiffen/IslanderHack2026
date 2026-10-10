@@ -69,7 +69,10 @@ def stage_inspect(cfg):
     _require_masks(cfg)
     if not hls.have_credentials():
         raise Skip("contact sheets need the Earthdata login to fetch true-colour bands")
-    inspect_masks.run(cfg)
+    try:
+        inspect_masks.run(cfg)
+    except Exception as exc:  # optional check: a network blip must not stop training
+        raise Skip(f"contact sheets failed ({type(exc).__name__}); rerun with --only inspect") from exc
 
 
 # ---- Phase 2: models and validation ----------------------------------------------------------
@@ -114,7 +117,8 @@ def stage_exposure(cfg):
         from flatcast.imagery.region import lagoon_region
         from flatcast.imagery.water_index import NODATA
 
-        region = lagoon_region(all_masks, grid, (lon, lat), shore_km=float(cfg.area.get("shore_km", 1.5)))
+        seed = tuple(cfg.area.get("water_seed") or (lon, lat))
+        region = lagoon_region(all_masks, grid, seed, shore_km=float(cfg.area.get("shore_km", 1.5)))
         np.save(cfg.paths.models / "region.npy", region)
         grid.write(cfg.paths.outputs / "maps" / "analysis_region.tif", region.astype(np.uint8), tags={"meaning": "1 = lagoon and its shores (analysed), 0 = excluded (Gulf, inland)"})
         all_masks[:, ~region] = NODATA
@@ -205,8 +209,25 @@ def stage_validate(cfg):
 
 def stage_forecast(cfg):
     from flatcast import forecast
+    from flatcast.models.waterlevel import model_dir
 
+    if cfg.waterlevel.model == "gbm" and not (model_dir(cfg) / "production" / "meta.json").exists():
+        raise Skip("no trained water-level model for this area yet")
     forecast.run(cfg)
+
+
+def stage_traps(cfg):
+    from flatcast import traps
+    from flatcast.forecast import exposure_model_path
+    from flatcast.hydro import load_hourly
+    from flatcast.models import exposure as E
+
+    if not exposure_model_path(cfg).exists():
+        raise Skip("suggested trap water needs the fitted exposure model")
+    model = E.ExposureModel.load(exposure_model_path(cfg))
+    region_path = cfg.paths.models / "region.npy"
+    region = np.load(region_path) if region_path.exists() else model.status != E.SPARSE
+    traps.run(cfg, model, region, load_hourly(cfg))
 
 
 # ---- Phase 4: sea-level rise ------------------------------------------------------------------
@@ -244,6 +265,7 @@ STAGES: dict[str, tuple[str, Callable]] = {
     "validate": ("Score both models on the held-out year", stage_validate),
     "forecast": ("Make the 48-hour exposure forecast", stage_forecast),
     "slr": ("Sea-level-rise scenarios", stage_slr),
+    "traps": ("Suggested crab-trap water", stage_traps),
     "site": ("Build the static web map", stage_site),
 }
 

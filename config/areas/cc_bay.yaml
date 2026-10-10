@@ -1,0 +1,28 @@
+# Corpus Christi Bay: the shallow southeast side of the bay behind Mustang Island,
+# around Shamrock Island. Everything not set here comes from ../../config.yaml.
+extends: ../../config.yaml
+
+project:
+  data_dir: ~/.flatcast/cc_bay
+  output_dir: outputs/cc_bay
+  flats_file: config/flats_cc_bay.geojson
+
+area:
+  id: cc_bay
+  name: Corpus Christi Bay
+  bbox: [-97.32, 27.66, -97.12, 27.84]
+  # The gauge is outside the box, so this point (open bay water) marks which water body to analyse.
+  water_seed: [-97.24, 27.77]
+
+stations:
+  primary: "8775296"         # USS Lexington, Corpus Christi Bay: hourly NAVD88 levels from 2015
+  wind: "8775237"            # Port Aransas: the Lexington gauge has no anemometer
+  gulf: "8775237"            # Port Aransas: Gulf connection; has astronomical tide predictions
+  south: "8776139"           # S. Bird Island: measures the tilt toward the Laguna Madre
+  start: "2015-01-01"
+
+imagery:
+  start: "2015-01-01"        # no gauge record before 2015 at Lexington
+
+wind:
+  point: [-97.22, 27.76]

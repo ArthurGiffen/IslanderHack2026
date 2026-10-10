@@ -46,7 +46,7 @@ def _live_hourly(cfg, issue_pad_h: int):
             on_hour = recent[recent.index.minute == 0]
             hourly = hourly.reindex(hourly.index.union(on_hour.index))
             hourly[col] = hourly[col].fillna(on_hour.reindex(hourly.index))
-    wind = coops.recent_wind(st.primary, cache)
+    wind = coops.recent_wind(st.get("wind", st.primary), cache)
     if len(wind):
         on_hour = wind[wind.index.minute == 0]
         u, v = to_uv(on_hour["speed"], on_hour["direction"])
@@ -133,8 +133,10 @@ def run(cfg) -> dict:
             "wind_ms": round(float(np.hypot(w["u"], w["v"])), 1) if np.isfinite(w["u"]) else None,
             "wind_from_deg": round(float(np.degrees(np.arctan2(-w["u"], -w["v"])) % 360)) if np.isfinite(w["u"]) else None,
         }
+        # What the browser needs to redraw the map itself: level uncertainty and wind-tilt stress.
+        tau = np.nan_to_num(f_tau.reindex([t]).to_numpy()[0])
+        frame.update(sigma=round(float(sigma), 4), tau_x=round(float(tau[0]), 2), tau_y=round(float(tau[1]), 2))
         if model is not None:
-            tau = np.nan_to_num(f_tau.reindex([t]).to_numpy()[0])
             p = model.p_dry(mid, tau, sigma)
             # "High confidence" uses the low-water end of the band: exposed even if the water runs high.
             p_hi_water = model.p_dry(hi, tau, 0.0)

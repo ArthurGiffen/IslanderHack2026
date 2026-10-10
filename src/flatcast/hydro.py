@@ -37,7 +37,7 @@ def build_hourly(cfg) -> pd.DataFrame:
     h_south = coops.water_level_hourly(st.south, start, cache, st.datum, end)
 
     console.log("Gauges: downloading observed wind and tide predictions")
-    wind = coops.wind_hourly(st.primary, start, cache, end)
+    wind = coops.wind_hourly(st.get("wind", st.primary), start, cache, end)
     tide = coops.tide_predictions_hourly(st.gulf, start, end + pd.Timedelta(days=3), cache, st.datum)
 
     console.log("Wind: downloading reanalysis history from Open-Meteo")

@@ -36,7 +36,8 @@ On macOS/Linux, install uv with `curl -LsSf https://astral.sh/uv/install.sh | sh
 
 | Command | What it does |
 |---|---|
-| `uv run flatcast run` | Whole pipeline, all stages in order |
+| `uv run flatcast run` | Whole pipeline, all stages in order, for every area |
+| `uv run flatcast run --area cc_bay` | Just one area |
 | `uv run flatcast run --only masks pairs` | Just some stages |
 | `uv run flatcast run --from exposure` | From one stage onward |
 | `uv run flatcast forecast` | Refresh the 48-h forecast and the site (schedule this) |
@@ -46,7 +47,25 @@ On macOS/Linux, install uv with `curl -LsSf https://astral.sh/uv/install.sh | sh
 
 Without an Earthdata login the pipeline still runs everything that doesn't need satellite data (gauges, water-level model, validation, live water-level forecast, site) and says clearly which stages it skipped.
 
-### Keeping the forecast fresh
+### Live deployment (GitHub Actions + Vercel)
+
+The live site is static. Every 3 hours a GitHub Actions job (`.github/workflows/deploy.yml`):
+1. puts the committed models from `trained/` in place (`flatcast import-models`);
+2. refreshes the gauges and runs the 48-hour forecast;
+3. builds the site and pushes it to the `deploy` branch.
+
+Vercel serves the `deploy` branch, so the site updates by itself. A run takes about 4 minutes, or less once the gauge downloads are cached.
+
+After training (or retraining) an area on your computer:
+```bash
+uv run flatcast export-models
+```
+Then commit `trained/` and push. One-time setup:
+1. GitHub → repository **Settings → Actions → General → Workflow permissions → Read and write**.
+2. **Actions** tab → *Forecast and deploy* → **Run workflow**, to create the `deploy` branch.
+3. vercel.com → **Add New → Project** → import the repository → *Framework preset: Other*, no build command → **Settings → Git → Production Branch: `deploy`** → redeploy.
+
+### Keeping the forecast fresh (on your own computer)
 
 To refresh the forecast every 3 hours on Windows:
 
@@ -98,7 +117,28 @@ Downloads and intermediate rasters (~1 GB) live in `~/.flatcast` rather than thi
 
 ### Named flats
 
-There's no official list of named flats here, so the first run draws them from the model: connected areas that go wet and dry within the normal range of water levels. They're named Flat A, B, C… from north to south and written to `config/flats.geojson`. Rename them (or replace the outlines with your own) in that file. FlatCast never overwrites it.
+There's no official list of named flats here, so the first run draws them from the model: connected areas that go wet and dry within the normal range of water levels. They're named Flat A, B, C… from north to south and written to `config/flats.geojson` (`config/flats_cc_bay.geojson` for Corpus Christi Bay). Rename them (or replace the outlines with your own) in that file. FlatCast never overwrites it.
+
+### Areas
+
+The web map has a switch between areas. Each area is its own small config file listed under `areas:` in `config.yaml`, and it overrides only what differs from the base:
+
+| Area | File | Gauge | Record |
+|---|---|---|---|
+| Bird Island Basin | `config.yaml` | S. Bird Island 8776139 | 2013– |
+| Corpus Christi Bay (southeast shore, behind Mustang Island) | `config/areas/cc_bay.yaml` | USS Lexington 8775296, with wind from Port Aransas 8775237 | 2015– |
+
+To add an area, copy `cc_bay.yaml` and change `area` (id, name, bbox, and `water_seed`: a point in open water, needed if the gauge is outside the box), `stations` and `project` (its own data and output folders). Add the file to `areas:` and run `uv run flatcast run --area <id>`. Each area downloads its own imagery (about an hour) and trains its own models.
+
+### The web map
+
+* **Next 48 h:** the forecast, hour by hour (slider or ▶).
+* **Pick a date:** any date, hour by hour. **Past dates** use the water level the gauge measured, so you see what the flats were like. **Within 48 h** they use the forecast. **Further ahead** they show an **outlook**: how exposed each flat typically is at that hour and time of year (last 8 years of levels, calm winds). It's marked in purple and labelled as not a forecast.
+* **Tap the map** anywhere for a plain answer ("72% chance dry: likely walkable. In Flat B."). A one-line summary at the top gives the next walkable window.
+* **Crab traps** tab: suggested trap water (magenta) that stays covered even at low water, lies within 250 m of the flats and keeps 60 m clear of USACE-maintained channels (orange). Also the 2026–27 TPWD trap rules, a countdown to the annual February closure, and **My spots**: a catch log that stays on the user's device and can be saved and loaded as a file. The trap layer is a depth and habitat suggestion, not catch data (`src/flatcast/traps.py`).
+* **Walkable:** highlights, in bright green, the ground with an 80%+ chance of being dry at the selected hour, and outlines the flats that have a walkable window that hour. The chart shades walkable hours.
+
+The browser computes these maps itself from each area's trained model (`site/data/<area>/model.bin`, cropped to the flats) and its hourly gauge history (`history.bin`). It uses the same equation as the Python model: for 18 March 2025, both give 7.7 km² walkable at Bird Island.
 
 ---
 
@@ -182,7 +222,7 @@ src/flatcast/
   publish.py, pipeline.py, cli.py
 web/                         site template (MapLibre, no build step)
 notebooks/                   01_masks_vs_gauge.ipynb (Phase 1 check)
-tests/                       cloud mask bits, MNDWI, per-pixel fit, forecast features
+tests/                       cloud mask bits, MNDWI, per-pixel fit, forecast features, area configs
 ```
 
 **Model size:** the exposure model is two numbers per pixel (a few MB). The water-level models are 24 small tree ensembles (~11 MB as text files). The forecast runs in about 10 seconds on a laptop.

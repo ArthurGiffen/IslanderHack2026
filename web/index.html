@@ -22,9 +22,10 @@
     </div>
     <div>
       <h1>FlatCast</h1>
-      <p>Upper Laguna Madre · Bird Island Basin</p>
+      <p id="areaname">Corpus Christi coast</p>
     </div>
   </header>
+  <nav class="areas" id="areas" aria-label="Choose an area"></nav>
 
   <aside class="sheet" id="sheet" aria-label="Forecast panel">
     <button class="grabber" id="grabber" aria-label="Expand or collapse panel"><span></span></button>
@@ -41,7 +42,31 @@
       </div>
     </section>
 
+    <div class="summary" id="summary" aria-live="polite"></div>
     <div class="notice" id="notice" hidden></div>
+    <div class="tips" id="tips" hidden>
+      <b>Quick start</b>
+      <ol>
+        <li><b>Drag the slider</b> (or press ▶) to move through the next 48 hours.</li>
+        <li><b>Green</b> = ground you could likely walk on at that hour. <b>Tap the map</b> anywhere for a plain answer.</li>
+        <li><b>Pick a date</b> to see any past day, or a typical day in the future.</li>
+      </ol>
+      <button id="tips-close">Got it</button>
+    </div>
+
+    <section class="modebar">
+      <div class="segmented small" role="group" aria-label="What to show">
+        <button id="mode-forecast" aria-pressed="true">Next 48 h</button>
+        <button id="mode-date" aria-pressed="false">Pick a date</button>
+      </div>
+      <input type="date" id="datepick" aria-label="Date" hidden>
+      <label class="switch" title="Highlight ground that is likely walkable">
+        <input type="checkbox" id="walktoggle" checked>
+        <span class="track"><span class="knob"></span></span>
+        <span class="switch-label">Walkable</span>
+      </label>
+    </section>
+    <div class="kindnote" id="kindnote" hidden></div>
 
     <section class="timeline">
       <svg id="chart" role="img" aria-label="Water level, observed and forecast"></svg>
@@ -56,6 +81,7 @@
 
     <nav class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="flats">Flats</button>
+      <button role="tab" aria-selected="false" data-tab="traps">Crab traps</button>
       <button role="tab" aria-selected="false" data-tab="legend">Legend</button>
       <button role="tab" aria-selected="false" data-tab="slr">Sea level</button>
       <button role="tab" aria-selected="false" data-tab="accuracy">Accuracy</button>
@@ -68,11 +94,46 @@
         <div id="flatlist" class="flatlist"></div>
       </section>
 
+      <section class="pane" id="pane-traps" role="tabpanel" hidden>
+        <div class="closure" id="closure"></div>
+        <label class="switch wide">
+          <input type="checkbox" id="traptoggle" checked>
+          <span class="track"><span class="knob"></span></span>
+          <span class="switch-label">Show suggested trap water <i class="swatch trap"></i> and channels <i class="swatch chan"></i></span>
+        </label>
+        <p class="hint" id="trapinfo"></p>
+
+        <h3 class="sub">My spots</h3>
+        <p class="hint">Log where you set traps and what you caught. Your log stays on this device and is shown on the map as <i class="swatch spot"></i>.</p>
+        <div class="spotbar">
+          <button class="btn" id="addspot">+ Add a spot</button>
+          <button class="btn ghost" id="exportspots">Save log</button>
+          <label class="btn ghost">Load log<input type="file" id="importspots" accept="application/json" hidden></label>
+        </div>
+        <div id="spotlist" class="spotlist"></div>
+
+        <h3 class="sub">Texas rules, recreational crab traps</h3>
+        <ul class="rules">
+          <li>License: Texas fishing license <b>plus saltwater endorsement</b>. Recreational crabs can't be sold.</li>
+          <li><b>Up to 6 traps</b>, each no more than 18 cubic feet, at least <b>100 ft from another trap</b> unless tied to a pier or dock.</li>
+          <li>Each crab-holding chamber needs <b>2 escape vents</b> of at least 2 3/8 in., plus a <b>degradable panel</b> (untreated jute, sisal or thin wire).</li>
+          <li><b>White buoy</b> at least 6 × 6 × 6 in. with a 2 in. contrasting centre stripe. No plastic bottles. A <b>gear tag</b> (valid 10 days) within 6 in. of the buoy or pier.</li>
+          <li>Pull traps or remove crabs only from <b>30 min before sunrise to 30 min after sunset</b>.</li>
+          <li>Blue crabs: <b>5 in.</b> minimum, spine tip to spine tip. No egg-bearing (sponge) crabs. No limit on numbers.</li>
+          <li><b>Closed: Feb 19–28, 2027</b>. No traps in coastal waters during the annual abandoned-trap cleanup.</li>
+          <li>Channels: in <b>Aransas County</b>, traps must be 200 ft from a marked navigable channel. In Nueces and Kleberg counties channels aren't off limits, but boat traffic cuts trap lines, so the map keeps clear of them.</li>
+          <li>Inside <b>Padre Island National Seashore</b> waters, check park rules first: (361) 949-8173.</li>
+        </ul>
+        <p class="hint small">Summary of the TPWD Outdoor Annual, valid Sep 1, 2026 to Aug 31, 2027. Always check the current <a href="https://tpwd.texas.gov/regulations/outdoor-annual/fishing/general-rules-regulations/legal-devices-for-fish" target="_blank" rel="noopener">legal devices</a> and <a href="https://tpwd.texas.gov/regulations/outdoor-annual/fishing/shellfish-regulations/crab-and-ghost-shrimp-legal-devices-and-restrictions" target="_blank" rel="noopener">crab</a> pages. Suggested trap water stays covered even at low water (so traps aren't left dry), lies within 250 m of the flats where crabs feed, and keeps 60 m clear of maintained channels. It's based on water depth and habitat, not catch records.</p>
+      </section>
+
       <section class="pane" id="pane-legend" role="tabpanel" hidden>
         <div class="legend">
           <div class="ramp" aria-hidden="true"></div>
           <div class="ramp-labels"><span>Flooded</span><span>Uncertain</span><span>Exposed</span></div>
           <dl class="classes">
+            <div><dt><i style="background:#ff5ca8"></i>Trap water</dt><dd>Crab traps tab: suggested water that stays covered even at low water, near the flats. Orange dashes are maintained navigation channels.</dd></div>
+            <div><dt><i style="background:#c6ff3d;box-shadow:0 0 0 2px #2b3a10 inset"></i>Walkable</dt><dd>Bright green highlight (switch it off with "Walkable"): ground with an 80%+ chance of being dry at the selected hour. Flats outlined in green have a walkable window that hour.</dd></div>
             <div><dt><i style="background:#c9792b"></i>Likely exposed</dt><dd>80% or higher chance the ground is dry</dd></div>
             <div><dt><i style="background:#efe6cf"></i>Uncertain</dt><dd>Could go either way. Ground at the waterline, or a forecast with a wide range</dd></div>
             <div><dt><i style="background:#3f8fa8"></i>Likely flooded</dt><dd>20% or lower chance the ground is dry</dd></div>
@@ -106,6 +167,8 @@
         <p>A machine-learning model predicts the Bird Island level up to 48 hours ahead from the wind forecast, recent water levels, the Gulf level at Packery Channel and the season. It gives a range, not just one number.</p>
         <h3>5 · Combine them</h3>
         <p>For each hour, the forecast range is run through every square's tipping point to give the chance that the square is dry. That's the map.</p>
+        <h3>Picking a date</h3>
+        <p><b>Past dates</b> use the water level the gauge actually measured, so you see what the flats were like. <b>The next 48 hours</b> use the forecast. <b>Further ahead</b>, no one can forecast the wind, so FlatCast shows an <b>outlook</b>: how exposed each flat typically is at that hour and time of year, from the last 8 years of water levels. It's marked in purple on the chart. Use it to plan, not to go.</p>
         <h3>What it can't tell you</h3>
         <p>"Exposed" means the satellite would see dry ground. It doesn't mean firm footing. Soft mud, algal mats, channels narrower than 30 m, fog and fast-rising water don't show up. <b>Always check conditions yourself and know your way back.</b></p>
         <h3>Credits</h3>

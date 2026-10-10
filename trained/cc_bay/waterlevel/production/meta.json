@@ -1,0 +1,57 @@
+{
+  "horizons": [
+    6,
+    12,
+    18,
+    24,
+    30,
+    36,
+    42,
+    48
+  ],
+  "quantiles": [
+    0.1,
+    0.5,
+    0.9
+  ],
+  "trained_until": "2026-10-10 03:00:00+00:00",
+  "rows": {
+    "6": 32138,
+    "12": 32132,
+    "18": 32126,
+    "24": 32120,
+    "30": 32114,
+    "36": 32108,
+    "42": 32102,
+    "48": 32096
+  },
+  "features": [
+    "h",
+    "dh3",
+    "dh6",
+    "dh12",
+    "dh24",
+    "h_mean24",
+    "gulf_minus_h",
+    "south_minus_h",
+    "u_obs",
+    "v_obs",
+    "u24",
+    "v24",
+    "tau_x",
+    "tau_y",
+    "tide_change",
+    "tide_trend",
+    "f_u_all",
+    "f_u_last12",
+    "f_v_all",
+    "f_v_last12",
+    "f_tx_all",
+    "f_tx_last12",
+    "f_ty_all",
+    "f_ty_last12",
+    "f_dp",
+    "season_sin",
+    "season_cos"
+  ]
+}

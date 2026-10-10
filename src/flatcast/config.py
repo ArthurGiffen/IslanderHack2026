@@ -57,10 +57,15 @@ class Paths:
 
 class Config(Section):
     path: Path
+    root: Path  # project folder: where the base config.yaml lives
+
+    @property
+    def area_id(self) -> str:
+        return self.area.get("id", "main")
 
     @property
     def paths(self) -> Paths:
-        root = self.path.parent
+        root = self.root
 
         def resolve(p: str) -> Path:
             q = Path(p).expanduser()
@@ -92,9 +97,34 @@ def find_config(start: Path | None = None) -> Path:
     raise FileNotFoundError("config.yaml not found; run flatcast from the project folder or pass --config")
 
 
+def _merge(base: dict, override: dict) -> dict:
+    out = dict(base)
+    for k, v in override.items():
+        out[k] = _merge(out[k], v) if isinstance(v, dict) and isinstance(out.get(k), dict) else v
+    return out
+
+
 def load_config(path: str | Path | None = None) -> Config:
-    p = Path(path) if path else find_config()
+    """Load a config file. An area file can start with `extends: <base.yaml>` and
+    override only what differs; relative paths always resolve from the project folder."""
+    p = (Path(path) if path else find_config()).resolve()
     with open(p, encoding="utf-8") as f:
-        cfg = Config(yaml.safe_load(f))
-    cfg.path = p.resolve()
+        data = yaml.safe_load(f) or {}
+    root = p.parent
+    if "extends" in data:
+        base = load_config(p.parent / data.pop("extends"))
+        root = base.root
+        base_data = {k: v for k, v in base.items() if k != "areas"}
+        data = _merge(base_data, data)
+    cfg = Config(data)
+    cfg.path = p
+    cfg.root = root
     return cfg
+
+
+def area_configs(cfg: Config) -> list[Config]:
+    """Every area listed under `areas:` in the base config (just this one if none are listed)."""
+    files = cfg.get("areas") or []
+    if not files:
+        return [cfg]
+    return [load_config(cfg.root / f) for f in files]

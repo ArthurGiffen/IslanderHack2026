@@ -10,7 +10,14 @@ project:
   # Sent to api.weather.gov in the User-Agent header, as NWS requests.
   contact: "FlatCast personal research project"
 
+# Areas shown in the web map's area switcher. Each file is processed separately by `flatcast run`.
+areas:
+  - config.yaml
+  - config/areas/cc_bay.yaml
+
 area:
+  id: bird_island
+  name: Bird Island Basin
   # Bounding box in WGS84 degrees: [west, south, east, north].
   # Default: ~20 x 20 km around Bird Island Basin, Padre Island.
   bbox: [-97.42, 27.39, -97.22, 27.57]

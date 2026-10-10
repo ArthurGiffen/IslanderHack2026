@@ -1,0 +1,54 @@
+# Every 3 hours: refresh the gauges, run the 48-hour forecast with the committed
+# models (trained/), rebuild the web map and publish it to the `deploy` branch.
+# Vercel serves the `deploy` branch, so the live site updates on every run.
+name: Forecast and deploy
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"   # minute 17 of every 3rd hour, UTC
+  workflow_dispatch:          # "Run workflow" button in the Actions tab
+  push:
+    branches: [main]
+
+permissions:
+  contents: write             # to push the built site to the deploy branch
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Restore cached gauge and wind downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.flatcast/**/raw
+          key: flatcast-raw-${{ github.run_id }}
+          restore-keys: flatcast-raw-
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Put the trained models in place
+        run: uv run flatcast import-models
+
+      - name: Refresh gauges, forecast and build the site
+        run: uv run flatcast run --only gauges --only forecast --only slr --only traps --only site
+
+      - name: Publish the site to the deploy branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: deploy
+          publish_dir: ./site
+          force_orphan: true
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "Forecast update"

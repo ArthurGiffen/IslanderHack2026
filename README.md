@@ -1,6 +1,8 @@
-# FlatCast
+# Skyline Scanner
 
 **A 48-hour forecast of which wind-tidal flats in the Upper Laguna Madre will be exposed or flooded, learned from twelve years of satellite history.**
+
+The code and command are called `flatcast` (the forecasting engine); the web app is Skyline Scanner.
 
 In the Laguna Madre the astronomical tide is only a few centimetres. Wind does the real work: a norther can drain the flats and a southeasterly can bury them, and because the flats are nearly level, a few centimetres flood or expose square kilometres. Tide tables can't predict that. FlatCast learns it from the record instead:
 
@@ -136,6 +138,7 @@ To add an area, copy `cc_bay.yaml` and change `area` (id, name, bbox, and `water
 * **Pick a date:** any date, hour by hour. **Past dates** use the water level the gauge measured, so you see what the flats were like. **Within 48 h** they use the forecast. **Further ahead** they show an **outlook**: how exposed each flat typically is at that hour and time of year (last 8 years of levels, calm winds). It's marked in purple and labelled as not a forecast.
 * **Tap the map** anywhere for a plain answer ("72% chance dry: likely walkable. In Flat B."). A one-line summary at the top gives the next walkable window.
 * **Crab traps** tab: suggested trap water (magenta) that stays covered even at low water, lies within 250 m of the flats and keeps 60 m clear of USACE-maintained channels (orange). Also the 2026–27 TPWD trap rules, a countdown to the annual February closure, and **My spots**: a catch log that stays on the user's device and can be saved and loaded as a file. The trap layer is a depth and habitat suggestion, not catch data (`src/flatcast/traps.py`).
+* **Link drone** (under the logo): opens the Coastwatch beach-survey dashboard (`web/drone/`) in a full-screen panel. For now it is a **simulation** (route planning, camera view, trap and litter detection), clearly labelled "no drone connected". Hardware gets wired in there later.
 * **Walkable:** highlights, in bright green, the ground with an 80%+ chance of being dry at the selected hour, and outlines the flats that have a walkable window that hour. The chart shades walkable hours.
 
 The browser computes these maps itself from each area's trained model (`site/data/<area>/model.bin`, cropped to the flats) and its hourly gauge history (`history.bin`). It uses the same equation as the Python model: for 18 March 2025, both give 7.7 km² walkable at Bird Island.

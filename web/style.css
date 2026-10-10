@@ -48,7 +48,7 @@ a { color: var(--teal-2); }
 .sheet {
   position: fixed; z-index: 2; top: 16px; right: 16px; bottom: 16px; width: 410px;
   display: flex; flex-direction: column; background: var(--sheet); border-radius: var(--radius); box-shadow: var(--shadow);
-  overflow: hidden;
+  overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
 }
 .grabber { display: none; }
 .now { padding: 18px 20px 10px; }
@@ -64,9 +64,9 @@ a { color: var(--teal-2); }
 .notice { margin: 4px 20px 6px; padding: 10px 12px; border-radius: 12px; font-size: 13px; background: color-mix(in srgb, var(--sand-2) 22%, var(--sheet)); color: var(--ink); }
 
 .timeline { padding: 4px 20px 6px; }
-#chart { width: 100%; height: 132px; display: block; }
+#chart { width: 100%; height: 150px; display: block; }
 #chart .grid line { stroke: var(--line); }
-#chart .axis text { fill: var(--ink-3); font: 10.5px var(--mono); }
+#chart .axis text { fill: var(--ink-2); font: 11.5px var(--mono); }
 #chart .band { fill: color-mix(in srgb, var(--sand) 22%, transparent); }
 #chart .median { fill: none; stroke: var(--sand); stroke-width: 2.4; stroke-linejoin: round; }
 #chart .obs { fill: none; stroke: var(--teal-2); stroke-width: 2; }
@@ -85,10 +85,11 @@ input[type=range] { flex: 1; appearance: none; height: 6px; border-radius: 6px; 
 input[type=range]::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--sheet); border: 3px solid var(--ink); cursor: grab; }
 input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--sheet); border: 3px solid var(--ink); cursor: grab; }
 
-.tabs { display: flex; gap: 2px; padding: 8px 14px 0; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.tabs { display: flex; gap: 2px; padding: 8px 14px 0; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; position: sticky; top: 0; z-index: 3; background: var(--sheet); }
 .tabs button { flex: none; border: 0; background: none; color: var(--ink-2); font: 500 13.5px var(--body); padding: 9px 10px 11px; cursor: pointer; border-bottom: 2.5px solid transparent; }
 .tabs button[aria-selected=true] { color: var(--ink); border-bottom-color: var(--sand); }
-.panes { flex: 1; overflow-y: auto; padding: 14px 20px 18px; }
+.panes { flex: none; min-height: 260px; padding: 14px 20px 18px; }
+.sheet > * { flex: none; }
 .hint { color: var(--ink-2); font-size: 13px; margin: 0 0 12px; }
 .hint.small { font-size: 12px; color: var(--ink-3); }
 
@@ -148,7 +149,7 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
 .flat-label { font: 600 12px var(--body); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8), 0 0 8px rgba(0,0,0,.5); pointer-events: none; white-space: nowrap; }
 .station-pin { width: 14px; height: 14px; border-radius: 50%; background: var(--sand); border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.5); }
 .maplibregl-ctrl-attrib { font-size: 10.5px; }
-.maplibregl-ctrl-top-left { top: 80px; }
+.maplibregl-ctrl-top-left { top: 128px; }
 
 /* ---- phones: bottom sheet --------------------------------------------------- */
 @media (max-width: 760px) {
@@ -164,7 +165,7 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
   .stat { padding: 7px 9px; }
   .stat .value { font-size: 16px; }
   .timeline, .panes { padding-left: 16px; padding-right: 16px; }
-  #chart { height: 104px; }
+  #chart { height: 128px; }
   .classes div { grid-template-columns: 1fr; gap: 2px; }
   .acc-grid { grid-template-columns: 1fr 1fr 1fr; }
   .maplibregl-ctrl-top-left { top: 64px; }
@@ -191,7 +192,7 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
 .switch input:checked + .track { background: #8fc21f; }
 .switch input:checked + .track .knob { left: 18px; }
 .switch input:focus-visible + .track { outline: 2px solid var(--teal-2); outline-offset: 2px; }
-.kindnote { margin: 0 20px 4px; font-size: 12px; color: var(--ink-2); padding: 6px 10px; border-radius: 9px; background: var(--sheet-2); border-left: 3px solid var(--teal-2); }
+.kindnote { margin: 2px 20px 6px; font-size: 13px; line-height: 1.45; color: var(--ink); padding: 8px 12px; border-radius: 9px; background: var(--sheet-2); border-left: 3px solid var(--teal-2); }
 .kindnote.forecast { border-left-color: var(--sand); }
 .kindnote.outlook { border-left-color: #9a7fd1; }
 #chart .band.outlook { fill: color-mix(in srgb, #9a7fd1 20%, transparent); }
@@ -252,3 +253,29 @@ h3.sub { font: 600 15px var(--display); margin: 16px 0 4px; }
 .pop-big .ok { color: #4d7a00; } .pop-big .maybe { color: #a0661c; } .pop-big .no { color: #145c7a; }
 .pop-trap { margin-top: 4px; padding-top: 4px; border-top: 1px solid #e2dccd; color: #b0287a; font-weight: 600; }
 @media (max-width: 760px) { .summary, .tips { margin-left: 16px; margin-right: 16px; } }
+
+/* ---- Link drone ------------------------------------------------------------------- */
+.dronebtn {
+  position: fixed; top: 76px; left: 16px; z-index: 3; display: inline-flex; align-items: center; gap: 7px;
+  border: 0; border-radius: 14px; padding: 10px 14px; background: #10191e; color: #e3eeee; font: 600 13.5px var(--body);
+  box-shadow: var(--shadow); cursor: pointer;
+}
+.dronebtn svg { width: 18px; height: 18px; fill: none; stroke: #60d0b6; stroke-width: 1.6; }
+.dronebtn:hover { background: #18262d; }
+.drone { position: fixed; inset: 0; z-index: 10; background: rgba(5, 10, 13, .62); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 18px; }
+.drone[hidden] { display: none; }
+.drone-card { width: min(1280px, 100%); height: min(900px, 100%); display: flex; flex-direction: column; background: var(--sheet); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.drone-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px 8px; flex-wrap: wrap; }
+.drone-head h2 { margin: 0; font: 650 20px var(--display); }
+.drone-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: #a0661c; }
+.drone-status i { width: 8px; height: 8px; border-radius: 50%; background: #e0b25c; box-shadow: 0 0 0 3px color-mix(in srgb, #e0b25c 30%, transparent); }
+.drone-actions { display: flex; gap: 8px; }
+.drone-actions a.btn { text-decoration: none; display: inline-flex; align-items: center; }
+.drone-note { margin: 0 18px 10px; font-size: 13px; color: var(--ink-2); }
+#drone-frame { flex: 1; width: 100%; border: 0; border-top: 1px solid var(--line); background: #0b1216; }
+@media (max-width: 760px) {
+  .dronebtn { top: 108px; left: auto; right: 12px; padding: 7px 11px; font-size: 12.5px; }
+  .drone { padding: 0; }
+  .drone-card { border-radius: 0; height: 100%; }
+  .drone-note { font-size: 12px; }
+}

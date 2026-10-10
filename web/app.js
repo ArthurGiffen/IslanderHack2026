@@ -1,4 +1,4 @@
-/* FlatCast web map. Static: everything comes from ./data/. The exposure map for any hour is
+/* Skyline Scanner web map (FlatCast engine). Static: everything comes from ./data/. The exposure map for any hour is
    computed here, in the browser, from each area's trained model (data/<area>/model.bin). */
 (() => {
   "use strict";
@@ -575,7 +575,7 @@
         if (p.inside && tm.data[(p.row * tm.w + p.col) * 4 + 3] > 0) lines.push(`<div class="pop-trap">Suggested trap water: stays covered even at low water, close to the flats.</div>`);
       }
     }
-    if (!lines.length) lines.push(`<div>Open water, channel or dry land. FlatCast only forecasts the flats that go wet and dry.</div>`);
+    if (!lines.length) lines.push(`<div>Open water, channel or dry land. Skyline Scanner only forecasts the flats that go wet and dry.</div>`);
     new maplibregl.Popup({ maxWidth: "280px" }).setLngLat([lng, lat]).setHTML(lines.join("")).addTo(state.map);
   }
 
@@ -674,7 +674,7 @@
     const blob = new Blob([JSON.stringify({ area: state.area.id, spots: loadSpots() }, null, 1)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `flatcast-spots-${state.area.id}.json`;
+    a.download = `skyline-scanner-spots-${state.area.id}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
@@ -685,7 +685,20 @@
       const have = loadSpots(), ids = new Set(have.map((s) => s.id));
       saveSpots([...have, ...incoming.filter((s) => !ids.has(s.id))]);
       renderSpots();
-    } catch (e) { alert("That file isn't a FlatCast spots log."); }
+    } catch (e) { alert("That file isn't a Skyline Scanner spots log."); }
+  }
+
+  // ------------------------------------------------------------------------------- drone (simulation for now)
+  function openDrone() {
+    const frame = $("drone-frame");
+    if (!frame.src) frame.src = "drone/index.html";
+    if (state.playing) play();
+    $("drone").hidden = false;
+    $("drone-close").focus();
+  }
+  function closeDrone() {
+    $("drone").hidden = true;
+    $("dronebtn").focus();
   }
 
   // ------------------------------------------------------------------------------- modes and controls
@@ -792,6 +805,10 @@
     $("datepick").addEventListener("change", () => { if ($("datepick").value) rebuildSeries(false); });
     $("walktoggle").addEventListener("change", (e) => { state.walk = e.target.checked; drawMap(); });
     $("traptoggle").addEventListener("change", showTrapLayers);
+    $("dronebtn").addEventListener("click", openDrone);
+    $("drone-close").addEventListener("click", closeDrone);
+    $("drone").addEventListener("click", (e) => { if (e.target.id === "drone") closeDrone(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("drone").hidden) closeDrone(); });
     $("addspot").addEventListener("click", startAddSpot);
     $("exportspots").addEventListener("click", exportSpots);
     $("importspots").addEventListener("change", (e) => { if (e.target.files[0]) importSpots(e.target.files[0]); e.target.value = ""; });

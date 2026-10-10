@@ -15,7 +15,7 @@ from flatcast import pipeline
 from flatcast.config import area_configs, load_config
 from flatcast.log import console
 
-app = typer.Typer(add_completion=False, help="FlatCast: forecast exposure of the Upper Laguna Madre wind-tidal flats.", no_args_is_help=True)
+app = typer.Typer(add_completion=False, help="Skyline Scanner (flatcast engine): forecast exposure of the Corpus Christi-area wind-tidal flats.", no_args_is_help=True)
 STAGE_NAMES = list(pipeline.STAGES)
 
 

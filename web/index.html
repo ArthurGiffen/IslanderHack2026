@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>FlatCast</title>
+  <meta name="description" content="48-hour forecast of which wind-tidal flats in the Upper Laguna Madre will be exposed or flooded, learned from satellite history.">
+  <meta name="theme-color" content="#0f1a1f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23145c7a'/%3E%3Cpath d='M4 20c4-3 8-3 12 0s8 3 12 0v8H4z' fill='%23e0b25c'/%3E%3Cpath d='M4 15c4-3 8-3 12 0s8 3 12 0' stroke='%23efe6cf' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <div id="map" aria-label="Map of the flats"></div>
+
+  <header class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#145c7a"/><path d="M4 20c4-3 8-3 12 0s8 3 12 0v8H4z" fill="#e0b25c"/><path d="M4 15c4-3 8-3 12 0s8 3 12 0" stroke="#efe6cf" stroke-width="2" fill="none"/></svg>
+    </div>
+    <div>
+      <h1>FlatCast</h1>
+      <p>Upper Laguna Madre · Bird Island Basin</p>
+    </div>
+  </header>
+
+  <aside class="sheet" id="sheet" aria-label="Forecast panel">
+    <button class="grabber" id="grabber" aria-label="Expand or collapse panel"><span></span></button>
+
+    <section class="now" aria-live="polite">
+      <div class="now-time">
+        <div class="when" id="when">Loading forecast…</div>
+        <div class="lead" id="lead"></div>
+      </div>
+      <div class="now-stats">
+        <div class="stat"><span class="label">Water level</span><span class="value" id="level">–</span><span class="sub" id="levelband"></span></div>
+        <div class="stat"><span class="label">Wind</span><span class="value" id="wind">–</span><span class="sub" id="winddir"></span></div>
+        <div class="stat"><span class="label">Exposed</span><span class="value" id="exposed">–</span><span class="sub">likely dry area</span></div>
+      </div>
+    </section>
+
+    <div class="notice" id="notice" hidden></div>
+
+    <section class="timeline">
+      <svg id="chart" role="img" aria-label="Water level, observed and forecast"></svg>
+      <div class="scrub">
+        <button id="play" class="play" aria-label="Play forecast">
+          <svg viewBox="0 0 24 24" class="icon-play"><path d="M8 5v14l11-7z"/></svg>
+          <svg viewBox="0 0 24 24" class="icon-pause"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+        </button>
+        <input id="slider" type="range" min="1" max="48" value="1" step="1" aria-label="Forecast hour">
+      </div>
+    </section>
+
+    <nav class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="flats">Flats</button>
+      <button role="tab" aria-selected="false" data-tab="legend">Legend</button>
+      <button role="tab" aria-selected="false" data-tab="slr">Sea level</button>
+      <button role="tab" aria-selected="false" data-tab="accuracy">Accuracy</button>
+      <button role="tab" aria-selected="false" data-tab="how">How it works</button>
+    </nav>
+
+    <div class="panes">
+      <section class="pane" id="pane-flats" role="tabpanel">
+        <p class="hint">Walkable window = at least <b id="minfrac">60%</b> of the flat has a <b id="pdry">80%</b>+ chance of being dry. Tap a flat to zoom.</p>
+        <div id="flatlist" class="flatlist"></div>
+      </section>
+
+      <section class="pane" id="pane-legend" role="tabpanel" hidden>
+        <div class="legend">
+          <div class="ramp" aria-hidden="true"></div>
+          <div class="ramp-labels"><span>Flooded</span><span>Uncertain</span><span>Exposed</span></div>
+          <dl class="classes">
+            <div><dt><i style="background:#c9792b"></i>Likely exposed</dt><dd>80% or higher chance the ground is dry</dd></div>
+            <div><dt><i style="background:#efe6cf"></i>Uncertain</dt><dd>Could go either way. Ground at the waterline, or a forecast with a wide range</dd></div>
+            <div><dt><i style="background:#3f8fa8"></i>Likely flooded</dt><dd>20% or lower chance the ground is dry</dd></div>
+          </dl>
+          <p class="hint">Colours already include the forecast's uncertainty: when the water-level forecast is less sure, the map fades toward the middle. Only ground that satellites have seen both wet and dry is coloured. Open water and dry land show the basemap.</p>
+          <p class="hint">Confidence for each flat: <span class="badge high">high</span> = still exposed if the water comes in at the high end of the forecast range. <span class="badge moderate">moderate</span> = exposed at the expected level only.</p>
+        </div>
+      </section>
+
+      <section class="pane" id="pane-slr" role="tabpanel" hidden>
+        <p class="hint">How often each flat would be exposed if today's range of water levels were shifted up. Crimson marks ground that is exposed today but would be <b>permanently flooded</b> (dry less than 5% of the time).</p>
+        <div class="segmented" id="slrbuttons"></div>
+        <div id="slrstats" class="slrstats"></div>
+        <p class="hint small">A "bathtub" view: it assumes the flats stay put. Real flats can build up with sediment, erode, or migrate. Use it to see which flats are most sensitive, not as a prediction for a given year.</p>
+      </section>
+
+      <section class="pane" id="pane-accuracy" role="tabpanel" hidden>
+        <div id="accuracy"></div>
+      </section>
+
+      <section class="pane prose" id="pane-how" role="tabpanel" hidden>
+        <h2>How FlatCast works</h2>
+        <p>In the Laguna Madre the moon's tide is only a few centimetres. Wind is what moves the water: a strong north wind can push it out and lower the level 30–60 cm, a southeasterly piles it back in. The flats are almost perfectly level, so a few centimetres decide whether they're covered or bare. Tide tables can't tell you that.</p>
+        <h3>1 · Learn from the satellite record</h3>
+        <p>Landsat and Sentinel-2 have photographed this area hundreds of times since 2013. For each clear image, FlatCast marks every 30 m square as water or dry ground. A water index (MNDWI) separates the two: water absorbs short-wave infrared light, sand reflects it. Clouds and their shadows are removed with the quality layer that comes with each image.</p>
+        <h3>2 · Match each picture to the water level</h3>
+        <p>The NOAA gauge at Bird Island records the water level every six minutes. Each image is paired with the level and the wind at the moment the satellite passed over.</p>
+        <h3>3 · Find each square's tipping point</h3>
+        <p>For every square, FlatCast finds the water level at which it's dry half the time. In effect, that's a height map of the flats built from hundreds of photographs. It also learns how wind tilts the water surface, because a strong wind makes the water at one end of the lagoon higher than at the gauge. Recent years count more than old ones, because the flats shift.</p>
+        <h3>4 · Forecast the water level</h3>
+        <p>A machine-learning model predicts the Bird Island level up to 48 hours ahead from the wind forecast, recent water levels, the Gulf level at Packery Channel and the season. It gives a range, not just one number.</p>
+        <h3>5 · Combine them</h3>
+        <p>For each hour, the forecast range is run through every square's tipping point to give the chance that the square is dry. That's the map.</p>
+        <h3>What it can't tell you</h3>
+        <p>"Exposed" means the satellite would see dry ground. It doesn't mean firm footing. Soft mud, algal mats, channels narrower than 30 m, fog and fast-rising water don't show up. <b>Always check conditions yourself and know your way back.</b></p>
+        <h3>Credits</h3>
+        <p>Water-level forecasting on this coast was pioneered by the <a href="https://www.cbi.tamucc.edu/" target="_blank" rel="noopener">Conrad Blucher Institute</a> at Texas A&amp;M University–Corpus Christi, whose neural-network forecasts and TCOON gauge network made this kind of work possible. FlatCast is built so their forecast can replace its own.</p>
+        <ul class="attrib" id="attrib"></ul>
+      </section>
+    </div>
+    <footer class="foot">Not a safety tool. Forecast issued <span id="issued">–</span>.</footer>
+  </aside>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

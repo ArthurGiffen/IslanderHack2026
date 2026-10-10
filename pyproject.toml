@@ -1,0 +1,41 @@
+[project]
+name = "flatcast"
+version = "0.1.0"
+description = "Forecast which wind-tidal flats in the Upper Laguna Madre will be exposed or flooded, learned from satellite history."
+requires-python = ">=3.12"
+dependencies = [
+    "earthaccess>=0.19.0",
+    "lightgbm>=4.7.0",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "pyarrow>=26.0.0",
+    "pyproj>=3.8.0",
+    "pyyaml>=6.0.3",
+    "rasterio>=1.5.2",
+    "requests>=2.34.2",
+    "rich>=15.0.0",
+    "scikit-image>=0.26.0",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
+    "shapely>=2.2.0",
+    "typer>=0.27.3",
+]
+
+[project.scripts]
+flatcast = "flatcast.cli:app"
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+    "nbconvert>=7.17.1",
+    "nbformat>=5.11.1",
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

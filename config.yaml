@@ -1,0 +1,76 @@
+# FlatCast configuration. Every path is relative to this file unless absolute.
+
+project:
+  # Downloads and intermediate rasters (~1 GB). Kept outside the project folder
+  # by default so OneDrive/Dropbox don't sync it.
+  data_dir: ~/.flatcast
+  output_dir: outputs        # maps, validation report, inspection sheets
+  site_dir: site             # the static web map
+  flats_file: config/flats.geojson   # auto-generated once; rename flats here
+  # Sent to api.weather.gov in the User-Agent header, as NWS requests.
+  contact: "FlatCast personal research project"
+
+area:
+  # Bounding box in WGS84 degrees: [west, south, east, north].
+  # Default: ~20 x 20 km around Bird Island Basin, Padre Island.
+  bbox: [-97.42, 27.39, -97.22, 27.57]
+  crs: EPSG:32614            # UTM 14N, the native projection of the HLS tiles here
+  resolution_m: 30
+  lagoon_only: true          # analyse only the lagoon and its shores; excludes the open Gulf
+  shore_km: 1.5              # how far from persistent lagoon water to look for flats
+
+stations:
+  primary: "8776139"         # S. Bird Island: inside the area; the gauge the model is built on
+  gulf: "8775792"            # Packery Channel: Gulf connection; has astronomical tide predictions
+  south: "8776604"           # Baffin Bay: southern Laguna, measures the along-lagoon tilt
+  datum: NAVD                # NAVD88; all levels in metres
+  start: "2013-01-01"        # hourly CO-OPS records start here
+
+imagery:
+  collections: [HLSL30, HLSS30]   # Landsat 8/9 and Sentinel-2A/B/C, harmonized
+  start: "2013-04-01"
+  min_clear_fraction: 0.5    # drop scenes with less clear ground than this
+  mask_adjacent: true        # also drop pixels next to clouds/shadows
+  mask_cirrus: true
+  mask_snow: false           # Fmask sometimes flags bright dry sand as snow
+  mask_high_aerosol: false
+  workers: 4                 # parallel scene reads
+  mndwi:
+    # Pixels with MNDWI >= water_above are water, <= dry_below are dry, and
+    # anything between is "ambiguous" (wet sand, algal mat, film of water) and
+    # is left out of the fit. Validate these with `flatcast run --only inspect`.
+    water_above: 0.10
+    dry_below: -0.10
+
+wind:
+  provider: openmeteo        # openmeteo | nws  (live forecast source)
+  openmeteo_model: gfs_seamless
+  point: [-97.318, 27.484]   # lon, lat where forecast winds are taken
+
+exposure:
+  recency_half_life_years: 3 # an image this many years old counts half as much
+  holdout_year: auto         # auto = most recent full calendar year
+  setup_window_hours: 6      # wind-stress averaging window for the water-surface tilt
+  fit_wind_setup: true       # learn the wind tilt of the water surface
+  min_obs: 15                # pixels with fewer clear observations are not fitted
+  newton_iterations: 30
+  setup_rounds: 3
+
+waterlevel:
+  model: gbm                 # gbm | cbi  (cbi = Conrad Blucher Institute adapter)
+  horizons_h: [6, 12, 18, 24, 30, 36, 42, 48]
+  quantiles: [0.1, 0.5, 0.9]
+  train_stride_h: 3          # use every 3rd hour as an issue time when training
+
+forecast:
+  hours: 48
+
+walkable:
+  p_dry: 0.8                 # a pixel counts as exposed at this probability
+  min_area_fraction: 0.6     # a flat is "walkable" when this share of it is exposed
+  min_flat_area_km2: 0.4     # smallest auto-detected flat
+
+slr:
+  scenarios_cm: [10, 25, 50]
+  climate_years: 5           # recent years of gauge record used as the "normal" range
+  permanent_p_dry: 0.05      # exposed less than 5% of the time = permanently flooded

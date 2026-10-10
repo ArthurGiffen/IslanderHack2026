@@ -49,6 +49,8 @@ jobs:
           publish_branch: deploy
           publish_dir: ./site
           force_orphan: true
-          user_name: "github-actions[bot]"
-          user_email: "github-actions[bot]@users.noreply.github.com"
+          # Commits are signed as the repository owner: Vercel's free Hobby plan only
+          # deploys commits by the account owner, and refuses ones made by the GitHub bot.
+          user_name: "ArthurGiffen"
+          user_email: "183529135+ArthurGiffen@users.noreply.github.com"
           commit_message: "Forecast update"

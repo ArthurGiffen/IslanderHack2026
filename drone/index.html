@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en"
+  ><head
+    ><meta charset="utf-8" /><meta
+      name="viewport"
+      content="width=device-width,initial-scale=1"
+    /><title>Coastwatch · Beach Survey</title
+    ><style>
+      :root {
+        color-scheme: dark;
+        --background: #10191e;
+        --foreground: #e3eeee;
+        --border: #31464e;
+        --viz-series-1: #60d0b6;
+        --muted: #20333b;
+        --muted-foreground: #a6bbc1;
+        font-family: system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #0b1216;
+        color: var(--foreground);
+        font-size: 14px;
+      }
+      header {
+        padding: 22px 32px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+      }
+      header h1 {
+        font-size: 24px;
+        letter-spacing: -0.7px;
+        margin: 0;
+      }
+      header p {
+        color: var(--muted-foreground);
+        margin: 6px 0 0;
+      }
+      .badge {
+        padding: 8px 12px;
+        background: #1a3e35;
+        color: #8ee3ca;
+        border-radius: 20px;
+        font-size: 12px;
+      }
+      main {
+        max-width: 1500px;
+        margin: auto;
+        padding: 24px 32px;
+      }
+      .viz-controls {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 18px;
+        background: #15232a;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      .btn {
+        border: 1px solid #39545e;
+        border-radius: 7px;
+        background: #22363f;
+        color: var(--foreground);
+        padding: 11px 15px;
+        font: inherit;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: #65d9bc;
+        color: #0d2522;
+        border: 0;
+        font-weight: 600;
+      }
+      .form-label {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .form-range {
+        max-width: 150px;
+      }
+      .form-check {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .form-select {
+        padding: 8px;
+        border-radius: 6px;
+        background: #23343d;
+        color: var(--foreground);
+        border: 1px solid var(--border);
+      }
+      input {
+        accent-color: #65d9bc;
+      }
+      .text-small {
+        font-size: 12px;
+        color: var(--muted-foreground);
+        line-height: 1.6;
+      }
+      .tabular-nums {
+        font-variant-numeric: tabular-nums;
+      }
+      .viz-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #c4d7dc;
+      }
+      .views section,
+      .lower section {
+        min-width: 0;
+        padding: 16px;
+        background: #121f26;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      .viewport {
+        border-radius: 8px;
+      }
+      #routeinfo {
+        padding: 0 0 16px;
+      }
+      #telemetry {
+        font-size: 15px;
+      }
+      .table-responsive {
+        overflow-x: auto;
+      }
+      .table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 16px 0;
+      }
+      .table td,
+      .table th {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+      }
+      .table th {
+        color: var(--muted-foreground);
+        font-weight: 500;
+      }
+      .lower {
+        margin: 18px 0;
+      }
+      .cursor-interaction {
+        cursor: crosshair;
+      }
+      footer {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        color: var(--muted-foreground);
+        font-size: 12px;
+      }
+      @media (max-width: 600px) {
+        main {
+          padding: 16px;
+        }
+        header {
+          padding: 18px;
+        }
+        .badge {
+          display: none;
+        }
+        .form-label {
+          flex-wrap: wrap;
+        }
+      }</style
+    ><style>
+      .environment {
+        margin: 16px 0;
+      }
+      .environment summary {
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+      .environment .viz-controls {
+        padding: 12px;
+      }
+      .track-inspector {
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin: 20px 0;
+      }
+      .inspection-detail {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 20px;
+      }
+      .inspection-detail img {
+        width: 160px;
+        height: 160px;
+        object-fit: contain;
+        background: #10191e;
+        border-radius: 8px;
+      }
+      #history {
+        max-width: 100%;
+        width: 420px;
+        height: 110px;
+        margin-top: 12px;
+      }
+      #detail {
+        line-height: 1.7;
+      }
+      .table tr[aria-selected="true"] {
+        background: #254037;
+      }
+      .table td .btn {
+        padding: 5px 8px;
+        font-size: 12px;
+      }
+      @media (max-width: 600px) {
+        .inspection-detail {
+          grid-template-columns: 1fr;
+        }
+      }</style
+    ><style>
+      .speed-input {
+        width: 90px;
+        padding: 8px;
+        background: #23343d;
+        color: var(--foreground);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font: inherit;
+      }
+      .speed-input[aria-invalid="true"] {
+        border-color: #eaa676;
+      }
+    </style></head
+  ><body
+    ><header
+      ><div
+        ><h1>Coastwatch / Beach Survey</h1
+        ><p>Low-tide drone mission · coverage planning & debris tracking</p></div
+      ><span class="badge">SIMULATION / LOCAL COORDINATES</span></header
+    ><main
+      ><div id="beachsim">
+        <div class="viz-controls"
+          ><button class="btn btn-primary" id="flight">Start survey</button
+          ><button class="btn" id="random">Randomize beach</button
+          ><button class="btn" id="downloadreport">Download PDF report</button
+          ><label class="form-label"
+            >Simulation speed <output id="simrateval" for="simrate">1×</output
+            ><input
+              class="form-range"
+              id="simrate"
+              type="range"
+              min="0.25"
+              max="5"
+              step="0.25"
+              value="1"
+              aria-label="Simulation speed" /></label
+          ><label class="form-check"
+            ><input class="form-check-input" type="checkbox" id="place" /><span
+              class="form-check-label"
+              >Move objects on map</span
+            ></label
+          ><label class="form-label"
+            >Altitude <span id="heightval">8 m</span
+            ><input class="form-range" id="height" type="range" min="4" max="24" value="8" /></label
+          ><label class="form-label"
+            >Survey speed (m/s)
+            <input
+              class="speed-input"
+              id="speed"
+              type="number"
+              min="0.1"
+              max="100"
+              step="any"
+              value="10" /></label
+        ></div>
+        <details open class="environment"
+          ><summary>Environment & inspection</summary
+          ><div class="viz-controls"
+            ><label class="form-label"
+              >Wind <span id="windval">2 m/s</span
+              ><input id="wind" type="range" min="0" max="12" value="2" /></label
+            ><label class="form-label"
+              >Sun elevation <span id="sunval">45°</span
+              ><input id="sun" type="range" min="10" max="85" value="45" /></label
+            ><label class="form-label"
+              >Wet-sand glare <span id="glareval">25%</span
+              ><input id="glare" type="range" min="0" max="100" value="25" /></label
+            ><label class="form-label"
+              >Burial <span id="burialval">20%</span
+              ><input id="burial" type="range" min="0" max="70" value="20" /></label
+            ><label class="form-check"
+              ><input id="autoinspect" type="checkbox" checked />Automatic second pass</label
+            ><label class="form-label"
+              >Inspection speed (m/s)
+              <input
+                class="speed-input"
+                id="inspectSpeed"
+                type="number"
+                min="0.1"
+                max="100"
+                step="any"
+                value="8" /></label
+            ><label class="form-label"
+              >Descent (m/s)
+              <input
+                class="speed-input"
+                id="descentSpeed"
+                type="number"
+                min="0.1"
+                max="20"
+                step="any"
+                value="2.025" /></label
+            ><label class="form-label"
+              >Ascent (m/s)
+              <input
+                class="speed-input"
+                id="ascentSpeed"
+                type="number"
+                min="0.1"
+                max="20"
+                step="any"
+                value="2.7" /></label
+            ><button id="inspectnow" class="btn">Inspect uncertain tracks</button></div
+          ><div id="missionstatus" class="text-small" aria-live="polite"
+            >Survey → uncertain tracks → descend → 8-second hover</div
+          ></details
+        ><div class="viz-row tabular-nums" id="telemetry" aria-live="polite">Loading 3D scene…</div>
+        <div id="routeinfo" class="text-small tabular-nums"></div>
+        <div class="views"
+          ><section
+            ><h3>Isometric drone view · camera footprint</h3
+            ><div id="world" class="viewport"></div></section
+          ><section
+            ><h3>Drone camera · downward RGB</h3
+            ><div id="pov" class="viewport"><canvas id="boxes"></canvas></div></section
+        ></div>
+        <div class="lower"
+          ><section
+            ><h3>Ground truth · placement map</h3
+            ><canvas
+              id="map"
+              class="cursor-interaction"
+              aria-label="Ground truth map. In placement mode click to move the next trap."
+              role="img"
+            ></canvas
+            ><div class="text-small" id="mapcaption"
+              >▦ cage: crab trap · circles/squares: litter · triangle: drone</div
+            ></section
+          ><section
+            ><h3>Drone knowledge · surveyed land</h3
+            ><canvas
+              id="knowledge"
+              role="img"
+              aria-label="Drone knowledge map: surveyed ground, traveled path and detected traps only"
+            ></canvas
+            ><div class="text-small"
+              >Shaded: observed · blank: unknown · line: flown path<br />Circle: candidate · square:
+              confirmed · triangle: drone</div
+            ><div id="knownstatus" class="text-small tabular-nums" aria-live="polite"
+              >0% observed · 0 detections</div
+            ></section
+          ></div
+        >
+        <section class="track-inspector"
+          ><h3>Selected track</h3
+          ><div class="inspection-detail"
+            ><img id="crop" alt="Latest rendered camera crop for selected track" hidden /><div
+              ><div id="detail" aria-live="polite"
+                >Select an object track or a detected map marker.</div
+              ><canvas
+                id="history"
+                width="420"
+                height="110"
+                role="img"
+                aria-label="Selected track confidence history"
+              ></canvas
+              ><div id="historylabels" class="text-small"
+                >Confidence history · camera observations only</div
+              ></div
+            ></div
+          ></section
+        ><section class="trap-section"
+          ><h3>▦ Crab trap tracks · fishing gear</h3
+          ><div id="trapcounts" class="viz-row text-small" aria-live="polite"
+            >No crab traps identified</div
+          ><p class="text-small"
+            >Crab traps are recorded separately from general litter. Detection does not establish
+            whether a trap is abandoned or actively used.</p
+          ><div class="table-responsive"
+            ><table class="table table-sm tabular-nums"
+              ><thead
+                ><tr
+                  ><th>Trap / class</th><th>State</th><th>Confidence*</th><th>E / N (m)</th
+                  ><th>Uncertainty (m)</th><th>Sightings</th></tr
+                ></thead
+              ><tbody id="traptracks"
+                ><tr><td colspan="6">No crab trap sightings</td></tr></tbody
+              ></table
+            ></div
+          ></section
+        ><section
+          ><h3>Litter & unclassified tracks · simulated estimates</h3
+          ><div id="classcounts" class="viz-row text-small"></div
+          ><div class="table-responsive"
+            ><table class="table table-sm tabular-nums"
+              ><thead
+                ><tr
+                  ><th>Track / class</th><th>State</th><th>Confidence*</th><th>E / N (m)</th
+                  ><th>Uncertainty (m)</th><th>Sightings</th></tr
+                ></thead
+              ><tbody id="tracks"
+                ><tr><td colspan="6">No sightings</td></tr></tbody
+              ></table
+            ></div
+          ></section
+        >
+        <div class="text-small"
+          >10 crab traps + 20 litter objects: bottles, cans, bags, tires, foam boxes. *Heuristic
+          confidence, not calibrated AI. Size in a simulated 1080p image, view angle, speed and
+          burial affect detections. Three sightings and ≥60% confidence confirm a track. Coverage
+          measures the full 112 × 80 m beach in 2 m cells. Observed ground does not mean all litter
+          was detected.</div
+        >
+      </div>
+      <style>
+        #beachsim .views {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+        #beachsim .viewport {
+          position: relative;
+          height: 360px;
+          overflow: hidden;
+        }
+        #beachsim .viewport canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+        #beachsim #boxes {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        #beachsim .lower {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+        #beachsim #map {
+          width: 100%;
+          height: 230px;
+          display: block;
+        }
+        #beachsim h3 {
+          margin: 12px 0 8px;
+        }
+        #beachsim #telemetry {
+          margin: 12px 0;
+        }
+        @media (max-width: 600px) {
+          #beachsim .views,
+          #beachsim .lower {
+            grid-template-columns: 1fr;
+          }
+          #beachsim .viewport {
+            height: 250px;
+          }
+        }
+      </style>
+      <script src="./three.min.js"></script>
+      <script src="./jspdf.umd.min.js"></script
+      ><script src="./pdf-report.js"></script
+      ><script src="./simulation.js"></script>
+
+      <footer
+        >Coverage is simulated on a flat 112 × 80 m beach. Detection confidence is heuristic; this
+        demo does not run an image-recognition model or control a physical aircraft.</footer
+      ></main
+    ></body
+  ></html
+>

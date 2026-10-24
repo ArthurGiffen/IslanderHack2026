@@ -1,0 +1,43 @@
+{
+ "built": "2026-10-24T15:59:20+00:00",
+ "areas": [
+  {
+   "id": "bird_island",
+   "name": "Bird Island Basin",
+   "bbox": [
+    -97.42,
+    27.39,
+    -97.22,
+    27.57
+   ],
+   "center": [
+    -97.32,
+    27.48
+   ],
+   "has_model": true
+  },
+  {
+   "id": "cc_bay",
+   "name": "Corpus Christi Bay",
+   "bbox": [
+    -97.32,
+    27.66,
+    -97.12,
+    27.84
+   ],
+   "center": [
+    -97.22,
+    27.75
+   ],
+   "has_model": true
+  }
+ ],
+ "attribution": [
+  "Water levels and wind: NOAA CO-OPS / Texas Coastal Ocean Observation Network",
+  "Imagery: NASA Harmonized Landsat Sentinel-2 (HLS v2.0)",
+  "Wind forecasts: Open-Meteo.com (CC BY 4.0) or US National Weather Service",
+  "Basemap: Sentinel-2 cloudless by EOX IT Services GmbH (CC BY-NC-SA 4.0), contains modified Copernicus Sentinel data",
+  "Navigation channels: USACE National Channel Framework",
+  "Crab rules: Texas Parks and Wildlife Department Outdoor Annual 2026-27"
+ ]
+}

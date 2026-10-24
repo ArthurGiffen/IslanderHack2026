@@ -1,0 +1,247 @@
+{
+  "climate_years": 5,
+  "permanent_threshold": 0.05,
+  "exposed_today_km2": 20.46,
+  "scenarios": [
+    {
+      "rise_cm": 0,
+      "permanently_flooded_km2": 0.0,
+      "share_of_today_lost": 0.0,
+      "png": "slr_0cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat F",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat G",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat H",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat I",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat J",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat K",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat L",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat M",
+          "share_lost": 0.0
+        }
+      ]
+    },
+    {
+      "rise_cm": 10,
+      "permanently_flooded_km2": 1.2,
+      "share_of_today_lost": 0.058,
+      "png": "slr_10cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.014
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.003
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.039
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.02
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.013
+        },
+        {
+          "name": "Flat F",
+          "share_lost": 0.089
+        },
+        {
+          "name": "Flat G",
+          "share_lost": 0.004
+        },
+        {
+          "name": "Flat H",
+          "share_lost": 0.083
+        },
+        {
+          "name": "Flat I",
+          "share_lost": 0.04
+        },
+        {
+          "name": "Flat J",
+          "share_lost": 0.056
+        },
+        {
+          "name": "Flat K",
+          "share_lost": 0.052
+        },
+        {
+          "name": "Flat L",
+          "share_lost": 0.025
+        },
+        {
+          "name": "Flat M",
+          "share_lost": 0.082
+        }
+      ]
+    },
+    {
+      "rise_cm": 25,
+      "permanently_flooded_km2": 3.0,
+      "share_of_today_lost": 0.147,
+      "png": "slr_25cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.06
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.02
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.145
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.061
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.039
+        },
+        {
+          "name": "Flat F",
+          "share_lost": 0.199
+        },
+        {
+          "name": "Flat G",
+          "share_lost": 0.008
+        },
+        {
+          "name": "Flat H",
+          "share_lost": 0.203
+        },
+        {
+          "name": "Flat I",
+          "share_lost": 0.135
+        },
+        {
+          "name": "Flat J",
+          "share_lost": 0.18
+        },
+        {
+          "name": "Flat K",
+          "share_lost": 0.163
+        },
+        {
+          "name": "Flat L",
+          "share_lost": 0.112
+        },
+        {
+          "name": "Flat M",
+          "share_lost": 0.204
+        }
+      ]
+    },
+    {
+      "rise_cm": 50,
+      "permanently_flooded_km2": 9.47,
+      "share_of_today_lost": 0.463,
+      "png": "slr_50cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.476
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.164
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.608
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.147
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.153
+        },
+        {
+          "name": "Flat F",
+          "share_lost": 0.452
+        },
+        {
+          "name": "Flat G",
+          "share_lost": 0.02
+        },
+        {
+          "name": "Flat H",
+          "share_lost": 0.554
+        },
+        {
+          "name": "Flat I",
+          "share_lost": 0.548
+        },
+        {
+          "name": "Flat J",
+          "share_lost": 0.376
+        },
+        {
+          "name": "Flat K",
+          "share_lost": 0.628
+        },
+        {
+          "name": "Flat L",
+          "share_lost": 0.617
+        },
+        {
+          "name": "Flat M",
+          "share_lost": 0.586
+        }
+      ]
+    }
+  ]
+}

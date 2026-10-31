@@ -1,0 +1,119 @@
+{
+  "climate_years": 5,
+  "permanent_threshold": 0.05,
+  "exposed_today_km2": 13.34,
+  "scenarios": [
+    {
+      "rise_cm": 0,
+      "permanently_flooded_km2": 0.0,
+      "share_of_today_lost": 0.0,
+      "png": "slr_0cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.0
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.0
+        }
+      ]
+    },
+    {
+      "rise_cm": 10,
+      "permanently_flooded_km2": 3.43,
+      "share_of_today_lost": 0.257,
+      "png": "slr_10cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.162
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.101
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.166
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.069
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.069
+        }
+      ]
+    },
+    {
+      "rise_cm": 25,
+      "permanently_flooded_km2": 6.91,
+      "share_of_today_lost": 0.518,
+      "png": "slr_25cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.476
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.482
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.455
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.311
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.322
+        }
+      ]
+    },
+    {
+      "rise_cm": 50,
+      "permanently_flooded_km2": 9.9,
+      "share_of_today_lost": 0.742,
+      "png": "slr_50cm.png",
+      "flats": [
+        {
+          "name": "Flat A",
+          "share_lost": 0.859
+        },
+        {
+          "name": "Flat B",
+          "share_lost": 0.758
+        },
+        {
+          "name": "Flat C",
+          "share_lost": 0.826
+        },
+        {
+          "name": "Flat D",
+          "share_lost": 0.814
+        },
+        {
+          "name": "Flat E",
+          "share_lost": 0.77
+        }
+      ]
+    }
+  ]
+}

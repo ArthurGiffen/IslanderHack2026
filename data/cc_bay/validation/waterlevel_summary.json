@@ -1,0 +1,82 @@
+{
+  "FlatCast, forecast winds": {
+    "6": {
+      "mae_cm": 2.37,
+      "rmse_cm": 3.05,
+      "bias_cm": 1.33,
+      "coverage_10_90": 0.653
+    },
+    "24": {
+      "mae_cm": 3.99,
+      "rmse_cm": 5.19,
+      "bias_cm": 1.21,
+      "coverage_10_90": 0.747
+    },
+    "48": {
+      "mae_cm": 5.59,
+      "rmse_cm": 7.34,
+      "bias_cm": 2.25,
+      "coverage_10_90": 0.709
+    }
+  },
+  "FlatCast, perfect winds": {
+    "6": {
+      "mae_cm": 2.45,
+      "rmse_cm": 3.07,
+      "bias_cm": 1.46,
+      "coverage_10_90": 0.633
+    },
+    "24": {
+      "mae_cm": 4.0,
+      "rmse_cm": 5.21,
+      "bias_cm": 1.49,
+      "coverage_10_90": 0.743
+    },
+    "48": {
+      "mae_cm": 5.51,
+      "rmse_cm": 7.16,
+      "bias_cm": 2.26,
+      "coverage_10_90": 0.738
+    }
+  },
+  "Persistence (no change)": {
+    "6": {
+      "mae_cm": 10.1,
+      "rmse_cm": 11.97,
+      "bias_cm": -0.0
+    },
+    "24": {
+      "mae_cm": 5.29,
+      "rmse_cm": 7.05,
+      "bias_cm": 0.05
+    },
+    "48": {
+      "mae_cm": 8.1,
+      "rmse_cm": 10.55,
+      "bias_cm": 0.12
+    }
+  },
+  "Persistence + tide": {
+    "6": {
+      "mae_cm": 14.12,
+      "rmse_cm": 17.02,
+      "bias_cm": -0.0
+    },
+    "24": {
+      "mae_cm": 5.76,
+      "rmse_cm": 7.52,
+      "bias_cm": 0.05
+    },
+    "48": {
+      "mae_cm": 9.2,
+      "rmse_cm": 11.71,
+      "bias_cm": 0.12
+    }
+  },
+  "_meta": {
+    "holdout_year": 2025,
+    "issue_times": 1452,
+    "archived_wind_forecasts": true,
+    "band_scale_24h": 1.217
+  }
+}

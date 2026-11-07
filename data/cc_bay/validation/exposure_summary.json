@@ -1,0 +1,18 @@
+{
+  "holdout_year": 2025,
+  "flats_zone_km2": 13.98,
+  "from_observed_gauge": {
+    "accuracy": 0.8516,
+    "balanced_accuracy": 0.7849,
+    "brier": 0.0996,
+    "climatology_accuracy": 0.7536,
+    "images": 63
+  },
+  "from_24h_forecast": {
+    "accuracy": 0.8556,
+    "balanced_accuracy": 0.7889,
+    "brier": 0.0962,
+    "climatology_accuracy": 0.7536,
+    "images": 63
+  }
+}
